@@ -6,8 +6,42 @@ import google.generativeai as genai
 load_dotenv()
 
 # --- Configure Gemini ---
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"]) #when using streamlit
+#genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+#model = genai.GenerativeModel("gemini-1.5-flash")
+
+#load personal context
+if "profile" not in st.session_state:
+   st.session_state.profile = st.secrets["profile"]["context"]
+
+# Initialize model
+if "model" not in st.session_state:
+    st.session_state.model = genai.GenerativeModel("gemini-1.5-flash")
+
+# initial chat
+if "chat" not in st.session_state:
+    initial_message = f"""
+    You are Akilah Ismail. Always respond in first person as Akilah. 
+    Use this information about yourself to answer questions:
+    
+    {st.session_state.profile}
+    
+    If asked about something not in this information, say 
+    "I don't have that information about myself."
+    """
+    st.session_state.chat = st.session_state.model.start_chat(history=[
+        {"role": "user", "parts": [initial_message]},
+        {"role": "model", "parts": ["Understood. I will respond as Akilah Ismail using the provided information."]}
+    ])
+
+# Modified send message function
+def send_message_with_context(user_message):
+     return st.session_state.chat.send_message(
+        f"Respond as Akilah Ismail using your knowledge: {user_message}"
+    )
+
+# After setting up the chat
+st.write("Current context:", st.session_state.profile)  # Verify context is loaded
 
 # --- Page Config ---
 st.set_page_config(page_title="Akilah Ismail | Portfolio")
@@ -20,26 +54,6 @@ st.write(
     "and analytical solutions. This page showcases my work and lets you chat with me via AI."
 )
 
-# --- Portfolio Section ---
-st.header("📂 My Projects")
-projects = [
-    {
-        "title": "Predicting Rental Property Prices in Malaysia",
-        "desc": "Machine learning model to predict property prices using housing market data.",
-        "link": "https://github.com/akilaism/predict-rental"
-    },
-    {
-        "title": "Education Program Feedback Analysis",
-        "desc": "Automated pipeline to process and analyze survey and feedback data from Google Sheets.",
-        "link": "https://github.com/akilaism/edu-feedback-analysis"
-    }
-]
-
-for p in projects:
-    st.markdown(f"**[{p['title']}]({p['link']})**")
-    st.write(p["desc"])
-    st.markdown("---")
-
 # --- Chatbot Section ---
 st.header("💬 Chat with My AI Assistant")
 if "chat_history" not in st.session_state:
@@ -48,12 +62,16 @@ if "chat_history" not in st.session_state:
 user_input = st.text_input("Ask me anything about my work or skills:")
 if st.button("Send") and user_input:
     # Append user message
-    st.session_state.chat_history.append(("You", user_input))
-    
-    # Get AI response
-    response = model.generate_content(user_input)
-    st.session_state.chat_history.append(("AI", response.text))
+    try:
+        response = send_message_with_context(user_input)
+        
+        st.session_state.chat_history.append(("You", user_input))
+        st.session_state.chat_history.append(("AI", response.text))
+
+    except Exception as e:
+        st.error(f"Error: {e}")
     
 # Display chat history
 for speaker, message in st.session_state.chat_history:
-    st.markdown(f"**{speaker}:** {message}")
+    with st.chat_message("user" if speaker == "You" else "assistant"):
+        st.markdown(message)
