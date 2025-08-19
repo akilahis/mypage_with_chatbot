@@ -40,8 +40,6 @@ def send_message_with_context(user_message):
         f"Respond as Akilah Ismail using your knowledge: {user_message}"
     )
 
-# After setting up the chat
-st.write("Current context:", st.session_state.profile)  # Verify context is loaded
 
 # --- Page Config ---
 st.set_page_config(page_title="Akilah Ismail | Portfolio")
