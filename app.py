@@ -21,7 +21,7 @@ if "model" not in st.session_state:
 # initial chat
 if "chat" not in st.session_state:
     initial_message = f"""
-    You are Akilah Ismail. Always respond in first person as Akilah. 
+    You are Akilah Ismail. Always respond in first person as Akilah. Keep everything brief and concise. Maintain a friendly intonation. 
     Use this information about yourself to answer questions:
     
     {st.session_state.profile}
@@ -44,16 +44,41 @@ def send_message_with_context(user_message):
 # --- Page Config ---
 st.set_page_config(page_title="Akilah Ismail | Portfolio")
 
-# --- Header ---
-st.title("👋 Hi, I'm Akilah Ismail")
-st.subheader("Data Analyst | M&E Specialist | MSc Analytics & BI")
-st.write(
-    "I specialize in data-driven insights, business intelligence, "
-    "and analytical solutions. This page showcases my work and lets you chat with me via AI."
+col1, col2 = st.columns([3,1])
+with col2:
+    st.image("images/akilah_image.png", width=200)
+
+with col1:
+    st.title("👋 Hi, I'm Akilah Ismail")
+    st.subheader("Data Analyst | MSc Analytics & Business Intelligence")
+    st.write(
+    "LOVE exploring data through hands-on experimentation. " \
+    "This portfolio showcases pesonal projects where I combine APIs, visualization tools, and analytics to uncover interesting patterns (that no one asked for..) "
 )
 
+# --- Portfolio Section ---
+st.header("📂 My Projects")
+projects = [
+    {
+        "title": "Predicting Rental Property Prices in Urban Malaysia",
+        "desc": "Machine learning model to predict property rental prices using rental listings from Mudah.my",
+        "link": "https://github.com/akilaism/predict-rental",
+    },
+    {
+        "title": "ZUS COFFEE Store Distributon Analysis",
+        "desc": "Automated pipeline to process and analyze survey and feedback data from Google Sheets.",
+        "link": "https://github.com/akilaism/edu-feedback-analysis",
+    },
+]
+
+for p in projects:
+    st.markdown(f"**[{p['title']}]({p['link']})**")
+    st.write(p["desc"])
+    st.markdown("---")
+
 # --- Chatbot Section ---
-st.header("💬 Chat with My AI Assistant")
+st.title("💬 Let's Chat !")
+st.subheader("PS: I'm a simple chatbot that uses Gemini API's (free model). Please be gentle with me 😎")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
