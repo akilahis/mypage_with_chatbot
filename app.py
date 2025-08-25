@@ -69,7 +69,7 @@ projects = [
         - Dataset are further enriched with extracting surrounding amenities (within 2km) via Open Street Map API.
         - TOOLS 🛠️ : Python (Pandas, Scikit-learn), OpenStreetMap API, Streamlit, Git/GitHub
         """,
-        "link": "https://github.com/akilaism/predict-rental",
+        "link": "https://github.com/akilahis/rental_price_analysis",
     },
     {
         "title": "ZUS COFFEE'S Stores Distributon Analysis",
